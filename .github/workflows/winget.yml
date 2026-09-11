@@ -1,0 +1,21 @@
+name: Publish to winget
+
+# Fires when a GitHub release is published in this repo. winget-releaser reads
+# the release's assets, computes their hashes, and opens a manifest-update PR
+# against microsoft/winget-pkgs on our behalf.
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - name: Submit manifest update to winget-pkgs
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: ArnavSawant.NotchBar
+          # MSI only. The NSIS .exe is unsigned, and winget validation can stall
+          # on unsigned exe installers at the Mark-of-the-Web / SmartScreen step.
+          installers-regex: '\.msi$'
+          token: ${{ secrets.WINGET_TOKEN }}
